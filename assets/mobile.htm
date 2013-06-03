@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html>
+        <head>
+            <title>IRCTC</title>
+            <link href="mobile.css" rel="stylesheet" type="text/css"/>
+            <script type="text/javascript">
+                function doLogin() {
+                    <!--jsi.showMessage("Inside javascript");-->
+                    var autoLogin = jsi.isAutoLoginEnabled();
+                    var username = jsi.getUserName();
+                    if(autoLogin == "true") {
+                        if(username == "") {
+                            return;
+                        }
+                        var form = document.forms['LoginForm'];
+                        form.elements['userName'].value = username;
+                        form.elements['password'].value = jsi.getPassword();
+                        document.LoginForm.submit();
+                    } else {
+                        document.forms.LoginForm.userName.focus();
+                    }
+                }
+                function doRequestSave() {
+                    var form = document.forms['LoginForm'];
+                    var userName = form.elements['userName'].value;
+                    var password = form.elements['password'].value;
+                    if (userName == "") {
+                        document.stop();
+                        return;
+                    }
+                    jsi.doRequestSave(userName,password);
+                }
+            </script>
+            <meta http-equiv='Cache-Control' content='must-revalidate' forua='true'/>
+            <meta http-equiv='Cache-Control' content='no-cache' forua='true'/>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+            <meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport">
+            <meta content="yes" name="apple-mobile-web-app-capable">
+            <meta content="true" name="HandheldFriendly">
+            <meta content="width" name="MobileOptimized">
+        </head>
+        <!--onload="doLogin();"-->
+        <body onload="doLogin();">
+             <card title="image">
+                <div id="mainframe">
+                    <div id="header"><span class="logo">
+                      <img style="vertical-align:top" src="irctclogobg.gif" alt="IRCTC Logo"/></span>
+                          <div class="whiteboldpadding"><strong>&nbsp;&nbsp;IRCTC Mobile (Beta)</strong></div>
+                     </div>
+                 </div>
+             </card>
+             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+                <form name="LoginForm" method="post" action="https://www.irctc.co.in/cgi-bin/soft.dll/irctc/login.do" onsubmit="doRequestSave();">
+                        <tr>
+                            <td height="40" colspan="2" align="center" valign="middle" class="gerytxt"><b>Login (Beta)</b></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2">
+                                <table width="100%" border="0" align="center" cellpadding="4" cellspacing="0" class="productbox">
+                                    <tr>
+                                        <td width="25%" align="center" class="normaltxt" nowrap="nowrap">User ID</td>
+                                        <td width="75%" height="30" align="left" valign="middle">
+                                            <input type="text" class="nametxtfld" name="userName" size="10" maxlength="15" autocomplete="off"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <table width="100%" border="0" align="center" cellpadding="4" cellspacing="0" class="productbox">
+                                    <tr>
+                                        <td width="25%" align="center" class="normaltxt">Password</td>
+                                        <td width="75%" height="30" align="left" valign="middle">
+                                            <input type="password" class="nametxtfld" name="password" size="10" maxlength="15" autocomplete="off"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" colspan="2" class="helptxt"><em>IRCTC User Credentials</em></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center" class="helptxt">&nbsp;&nbsp;</td>
+                        </tr>
+                        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="buttonholder">
+                            <tr>
+                                <td align="center" colspan="2"><input type="image" src="go.gif" vspace="5" alt="Login"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <card title="footer">
+                            <small>
+                                <div class="normalblack">&nbsp;</div>
+                                <div class="footercont">Copyright &#169; 2013 <a href="https://www.irctc.co.in">www.irctc.co.in</a><br/>
+                                 All Rights Reserved </div>
+                            </small>
+                        </card>
+                </form>
+            </table>
+        </body>
+</html>

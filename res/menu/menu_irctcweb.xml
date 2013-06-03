@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/action_reload"
+          android:title="@string/action_reload"
+          android:showAsAction="ifRoom|withText"
+          android:icon="@drawable/refresh" />
+    <item
+        android:id="@+id/action_stop_page"
+        android:title="Stop"
+        android:showAsAction="ifRoom|withText"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel" />
+    <item
+        android:id="@+id/action_back"
+        android:icon="@drawable/back"
+        android:title="Back"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_forward"
+        android:icon="@drawable/forward"
+        android:title="Forward"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/action_preferences"
+          android:title="@string/action_settings"
+          android:orderInCategory="100"
+          android:showAsAction="never" />
+</menu>

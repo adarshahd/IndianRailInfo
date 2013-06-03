@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.adarshahd.indianrailinfo.donate"
+    android:versionCode="2"
+    android:versionName="1.0.3" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/irctc"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.adarshahd.indianrailinfo.donate.IRCTCWeb"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.adarshahd.indianrailinfo.donate.PrefActivity"/>
+        <activity android:name="com.adarshahd.indianrailinfo.donate.Presenter">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="com.adarshahd.indianrailinfo.donate.TrainEnquiry"/>
+        <activity android:name="com.adarshahd.indianrailinfo.donate.PNRStat" />
+        <activity android:name="com.adarshahd.indianrailinfo.donate.TrainDetails"/>
+        <activity android:name="com.adarshahd.indianrailinfo.donate.TrainEnquiryDetails"/>
+
+    </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+</manifest>

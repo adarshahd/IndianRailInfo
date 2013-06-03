@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#FFDDDDDD">
+
+    <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9">
+        <FrameLayout
+                android:id="@+id/id_fl_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+        </FrameLayout>
+    </HorizontalScrollView>
+
+</LinearLayout>
