@@ -46,10 +46,10 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
     private static Button mBtnPNR;
     private PassengerDetails mPassengerDetails;
     private TrainDetails mTrainDetails;
-    private static String mPageResult;
+    private static String mPageResult = "";
     private static TableLayout mTableLayoutPsn;
     private static TableLayout mTableLayoutTrn;
-    private static String mPNRNumber;
+    private static String mPNRNumber = "";
     private static Util mUtil;
 
     @Override
@@ -124,6 +124,9 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
                 mTrainDetails = savedInstanceState.getParcelable("TRAIN");
                 mPageResult = savedInstanceState.getString("PAGE");
                 //mPNRNumber = savedInstanceState.getString("PNR");
+		if(mPageResult == null) {
+			return;
+		}
 
                 createTableLayoutTrnDtls();
                 createTableLayoutPsnDtls();
