@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,15 +42,15 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
 
     private static TableLayout mTableLayout;
     private static TableRow mRow;
-    private static String mTrainNumber;
-    private static String mSrc;
-    private static String mDst;
+    private static String mTrainNumber = "";
+    private static String mSrc = "";
+    private static String mDst = "";
     private static boolean searchUsingTrainNumber;
     private static boolean isInteger;
-    private static String mPage;
+    private static String mPage = "";
     private static Elements mElements;
     private static List<List<String>> mDetails;
-    private static String mSelectedTrain;
+    private static String mSelectedTrain = "";
     private static AutoCompleteTextView mACTFrom;
     private static AutoCompleteTextView mACTTo;
     private static Spinner mSpinnerClass;
@@ -60,7 +61,7 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
     private static ArrayAdapter<String> mAdapterStnCodes;
     private static Calendar mCal;
     private static Util mUtil;
-    private static String mAge;
+    private static String mAge = "";
     private static ProgressDialog mDialog;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,6 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
         Intent intent = getIntent();
         setContentView(R.layout.layout_train_enquiry_details);
         if (savedInstanceState != null) {
-            mTableLayout.removeAllViews();
             mTableLayout = null;
             mTableLayout = (TableLayout) findViewById(R.id.id_tl_en_details);
             initControls();
@@ -85,6 +85,8 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
         mPage = intent.getStringExtra(TrainEnquiry.PAGE);
 
         mUtil = Util.getUtil(this);
+        mCal = Calendar.getInstance();
+        mCal.set(Calendar.getInstance().get(Calendar.YEAR),intent.getIntExtra(TrainEnquiry.MONTH_TRAVEL,0),intent.getIntExtra(TrainEnquiry.DAY_TRAVEL,1));
         initControls();
         mACTFrom.setText(intent.getStringExtra(TrainEnquiry.SRC));
         mACTTo.setText(intent.getStringExtra(TrainEnquiry.DST));
@@ -111,7 +113,7 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
         mAdapterStnCodes = new ArrayAdapter<String>(this,R.layout.layout_dropdown_list,getResources().getStringArray(R.array.stn_codes));
         mACTFrom.setAdapter(mAdapterStnCodes);
         mACTTo.setAdapter(mAdapterStnCodes);
-        mCal = Calendar.getInstance();
+        //mCal = Calendar.getInstance();
         mBtnDate.setText(DateFormat.format("dd MMM yyyy", mCal));
         mTableLayout = (TableLayout) findViewById(R.id.id_tl_en_details);
 
@@ -166,7 +168,7 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
         switch (item.getItemId()) {
             case R.id.id_action_get_av:
                 if(!mUtil.isConnected()) {
-                    mUtil.showAlert("Alert","Not connected to network, Please check your network connection.");
+                    mUtil.showAlert("Alert","Network unavailable, Please check your network connection.");
                     return false;
                 }
                 if(isAvFormOK()){
@@ -185,7 +187,7 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
                 return true;
             case R.id.id_action_get_fare:
                 if(!mUtil.isConnected()) {
-                    mUtil.showAlert("Alert","Not connected to network, Please check your network connection.");
+                    mUtil.showAlert("Alert","Network unavailable, Please check your network connection.");
                     return false;
                 }
                 if(isFareFormOK()) {
@@ -216,7 +218,7 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
             mRow = new TableRow(this);
             mRow.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             mRow.setOnCreateContextMenuListener(this);
-            mRow.setBackgroundResource(R.drawable.card_background);
+            mRow.setBackgroundResource(R.drawable.button_selector);
             mRow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -267,7 +269,14 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
                 } else {
                     mElements = Jsoup.parse(mPage).select("table tbody tr td:containsOwn(Train Number)");
                 }
-                Iterator iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+                Iterator iterator = null;
+                try {
+                    iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.i("TrainEnquiryDetails", mPage);
+                    return null;
+                }
                 mDetails = new ArrayList<List<String>>();
                 List<String> list;
                 Element tmp;
@@ -286,7 +295,14 @@ public class TrainEnquiryDetails extends SherlockActivity implements View.OnClic
                 }
             } else {
                 Elements elements = Jsoup.parse(mPage).select("table tr td:containsOwn(Train No.)");
-                Iterator iterator = elements.first().parent().parent().getElementsByTag("tr").iterator();
+                Iterator iterator = null;
+                try {
+                    iterator = elements.first().parent().parent().getElementsByTag("tr").iterator();
+                } catch (Exception e) {
+                    Log.i("TrainEnquiryDetails",mPage);
+                    e.printStackTrace();
+                    return null;
+                }
                 mDetails = new ArrayList<List<String>>();
                 List<String> list;
                 Element tmp;

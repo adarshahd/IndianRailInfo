@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="IRCTC LOGIN INFO">
+        <CheckBoxPreference
+                android:key="enable_auto_login"
+                android:title="Enable auto login"
+                android:defaultValue="false"/>
+        <EditTextPreference
+                android:key="username"
+                android:title="Your Username"
+                android:defaultValue=""
+                android:dependency="enable_auto_login"/>
+        <EditTextPreference
+                android:key="password"
+                android:title="Your password"
+                android:defaultValue=""
+                android:dependency="enable_auto_login"
+                android:password="true"/>
+        <CheckBoxPreference
+                android:key="ask_save_user_info"
+                android:title="@string/ask_save_user_info"
+                android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

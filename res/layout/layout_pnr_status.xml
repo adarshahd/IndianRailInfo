@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFDDDDDD" >
+            android:background="#FFDDDDDD">
     <LinearLayout
                   android:orientation="vertical"
                   android:layout_width="match_parent"
@@ -30,13 +29,14 @@
                         android:padding="5dp"
                         android:text="PNR Number:"/>
 
-                <EditText
-                        android:id="@+id/id_et_pnr_sts"
+                <AutoCompleteTextView
+                        android:id="@+id/id_act_pnr_sts"
                         android:layout_marginLeft="10dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:hint="Enter your PNR number here"
+                        android:completionThreshold="1"
                         android:padding="5dp"
                         android:layout_weight="1"
                         android:inputType="number"
@@ -52,13 +52,19 @@
                     android:layout_margin="10dp"
                     android:background="@drawable/button_selector"/>
 
-            <FrameLayout
+            <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:id="@+id/id_fl_pnr">
 
             </FrameLayout>
+            </HorizontalScrollView>
+
         </LinearLayout >
     </LinearLayout>
 </ScrollView>

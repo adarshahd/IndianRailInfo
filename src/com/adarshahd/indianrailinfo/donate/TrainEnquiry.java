@@ -103,7 +103,7 @@ public class TrainEnquiry extends SherlockActivity implements View.OnClickListen
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         mUtil.delete();
     }
@@ -144,7 +144,7 @@ public class TrainEnquiry extends SherlockActivity implements View.OnClickListen
                 break;
             case R.id.id_btn_details:
                 if(!mUtil.isConnected()) {
-                    mUtil.showAlert("Alert","Not connected to network, Please check your network connection.");
+                    mUtil.showAlert("Alert","Network unavailable, Please check your network connection.");
                     return;
                 }
                 if(isFormOK()) {
@@ -332,6 +332,8 @@ public class TrainEnquiry extends SherlockActivity implements View.OnClickListen
         intent.putExtra(PAGE,mPage);
         intent.putExtra(SRC,mACTFrom.getText().toString());
         intent.putExtra(DST,mACTTo.getText().toString());
+        intent.putExtra(DAY_TRAVEL,mCal.get(Calendar.DAY_OF_MONTH));
+        intent.putExtra(MONTH_TRAVEL,mCal.get(Calendar.MONTH));
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         //Try to parse the mTrainNumber;

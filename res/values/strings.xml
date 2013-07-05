@@ -7,6 +7,21 @@
     <string name="save_user_info">Do you want to save login information?\nYou need not input your details next time when you in.</string>
     <string name="do_not_show">Do not show this message again</string>
     <string name="ask_save_user_info">Ask for saving user information</string>
+
+    <string-array name="track_schedule">
+        <item>Every 3 hour</item>
+        <item>Every 6 hour</item>
+        <item>Every 12 hour</item>
+        <item>Every day</item>
+        <item>Every week</item>
+    </string-array>
+    <string-array name="track_schedule_entries">
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+        <item>168</item>
+    </string-array>
     
     <string-array name="stn_codes">
         <item>A N DEV NAGAR - ACND</item>

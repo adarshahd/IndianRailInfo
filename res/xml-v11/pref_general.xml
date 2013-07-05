@@ -40,12 +40,11 @@
             android:entryValues="@array/track_schedule_entries"
             android:summary="Every day"
             android:defaultValue="24"/>
-        <!-- ListView in Gingerbread is a whole lot of mess, let us not show list till it is ready!
-            <Preference
+        <Preference
             android:title="PNR List"
             android:key="pnr_track_list"
             android:summary="List of PNRs which are being tracked"
-            android:dependency="enable_tracking" />-->
+            android:dependency="enable_tracking" />
         <Preference
             android:title="Add PNR"
             android:key="pnr_track_add"
@@ -79,6 +78,5 @@
                 android:key="rate"
                 android:title="Rate this app" />
     </PreferenceCategory>
-
 
 </PreferenceScreen>

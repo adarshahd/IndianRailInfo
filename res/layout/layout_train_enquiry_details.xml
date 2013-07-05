@@ -3,7 +3,6 @@
 
 <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -143,15 +142,14 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         <HorizontalScrollView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp" >
             <TableLayout
                     android:id="@+id/id_tl_en_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal|center_vertical">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
             </TableLayout>
         </HorizontalScrollView>
     </LinearLayout>

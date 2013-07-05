@@ -19,9 +19,4 @@
         android:icon="@drawable/forward"
         android:title="Forward"
         android:showAsAction="never" />
-
-    <item android:id="@+id/action_preferences"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          android:showAsAction="never" />
 </menu>

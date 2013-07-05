@@ -1,19 +1,35 @@
 package com.adarshahd.indianrailinfo.donate;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,6 +43,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +56,6 @@ import java.util.List;
  * Created by ahd on 5/27/13.
  */
 public class PNRStat extends SherlockActivity implements View.OnClickListener {
-    //private static final String ENQUIRY_PAGE = "https://www.irctc.co.in/cgi-bin/soft.dll/irctc/login.do";
     private static final String ENQUIRY_PAGE = "http://www.indianrail.gov.in/cgi_bin/inet_pnrstat_cgi.cgi";
     private static final String ENQUIRY_INPUT = "lccp_pnrno1";
     private static FrameLayout mFrameLayout;
@@ -51,9 +70,77 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
     private static TableLayout mTableLayoutTrn;
     private static String mPNRNumber = "";
     private static Util mUtil;
+    private static AutoCompleteTextView mACTPNR;
+
+    private static PNRDatabase pnrDB;
+    private static List<String> mStrPassengerDetails;
+    private static String mStrTrainDetails = "";
+    private static List<String> mPNRList;
+    private static SharedPreferences mPref;
+    private static boolean isWaitingList;
+
 
     @Override
-    protected void onDestroy() {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_pnr_status);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("PNR Status");
+        mUtil = Util.getUtil(this);
+        mBtnPNR = ((Button) findViewById(R.id.id_btn_get_pnr_sts));
+        mBtnPNR.setOnClickListener(this);
+        pnrDB = PNRDatabase.getPNRDatabase(this);
+        mPNRList = new ArrayList<String>();
+        mPNRList = pnrDB.getPNRs();
+        mACTPNR = (AutoCompleteTextView) findViewById(R.id.id_act_pnr_sts);
+        mACTPNR.setAdapter(new ArrayAdapter<String>(this,R.layout.layout_dropdown_list,mPNRList));
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);
+        isWaitingList = false;
+
+        if(savedInstanceState != null) {
+            if(!mPNRNumber.equals("")) {
+                if(!mUtil.isConnected()) {
+                    mFrameLayout = null;
+                    mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_pnr);
+                    readAndShowOfflinePNRStatus();
+                    return;
+                }
+                mFrameLayout = null;
+                mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_pnr);
+
+                mPassengerDetails = savedInstanceState.getParcelable("PSN");
+                mTrainDetails = savedInstanceState.getParcelable("TRAIN");
+                mPageResult = savedInstanceState.getString("PAGE");
+                if(mPageResult == null) {
+                    return;
+                }
+                
+                mTextViewPNRSts = null;
+                mTextViewPNRSts = new TextView(mActivity);
+                mTextViewPNRSts.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                mTextViewPNRSts.setGravity(Gravity.CENTER_HORIZONTAL);
+                mTextViewPNRSts.setTextColor(Color.RED);
+
+                createTableLayoutTrnDtls();
+                createTableLayoutPsnDtls();
+                combineTrainAndPsnDetails();
+                return;
+            }
+        }
+
+
+        mActivity = this;
+        mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_pnr);
+        mBtnPNR = ((Button) findViewById(R.id.id_btn_get_pnr_sts));
+        mBtnPNR.setOnClickListener(this);
+        mTextViewPNRSts = new TextView(mActivity);
+        mTextViewPNRSts.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mTextViewPNRSts.setGravity(Gravity.CENTER_HORIZONTAL);
+        mTextViewPNRSts.setTextColor(Color.RED);
+    }
+
+    @Override
+    public void onDestroy() {
         if (mGetPNRSts != null) {
             mGetPNRSts.cancel(true);
             mGetPNRSts = null;
@@ -85,7 +172,7 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("PSN",mPassengerDetails);
         outState.putParcelable("TRAIN",mTrainDetails);
         outState.putString("PAGE",mPageResult);
@@ -94,75 +181,30 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_pnr_status);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("PNR Status");
-        mUtil = Util.getUtil(this);
-        mBtnPNR = ((Button) findViewById(R.id.id_btn_get_pnr_sts));
-        mBtnPNR.setOnClickListener(this);
-
-        if(savedInstanceState != null) {
-            //mPNRNumber = ((EditText)findViewById(R.id.id_et_pnr_sts)).getText().toString();
-            if(!mPNRNumber.equals("")) {
-                mFrameLayout.removeAllViews();
-                mFrameLayout = null;
-                mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_pnr);
-
-    /*            if(mTableLayoutTrn != null) {
-                    mTableLayoutTrn.removeAllViews();
-                    mTableLayoutTrn = null;
-                }
-
-                if(mTableLayoutPsn != null) {
-                    mTableLayoutPsn.removeAllViews();
-                    mTableLayoutPsn = null;
-                }*/
-
-                mPassengerDetails = savedInstanceState.getParcelable("PSN");
-                mTrainDetails = savedInstanceState.getParcelable("TRAIN");
-                mPageResult = savedInstanceState.getString("PAGE");
-                //mPNRNumber = savedInstanceState.getString("PNR");
-		if(mPageResult == null) {
-			return;
-		}
-
-                createTableLayoutTrnDtls();
-                createTableLayoutPsnDtls();
-                combineTrainAndPsnDetails();
-                return;
-            }
-        }
-
-
-        mActivity = this;
-        mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_pnr);
-        mBtnPNR = ((Button) findViewById(R.id.id_btn_get_pnr_sts));
-        mBtnPNR.setOnClickListener(this);
-        mTextViewPNRSts = new TextView(mActivity);
-        mTextViewPNRSts.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        mTextViewPNRSts.setGravity(Gravity.CENTER_HORIZONTAL);
-        mTextViewPNRSts.setTextColor(Color.RED);
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.id_btn_get_pnr_sts:
+                mPNRNumber = ((EditText)findViewById(R.id.id_act_pnr_sts)).getText().toString();
+                if(mPNRList.contains(mPNRNumber) && !mUtil.isConnected()) {
+                    //Check the preference and show the stored PNR status
+                    if (mPref.getBoolean("pnr_offline",false)) {
+                        readAndShowOfflinePNRStatus();
+                        return;
+                    }
+                }
                 if(!mUtil.isConnected()) {
-                    mUtil.showAlert("Alert","Not connected to network, Please check your network connection.");
+                    mUtil.showAlert("Alert","Network unavailable, Please check your network connection.");
                     return;
                 }
                 mBtnPNR = (Button) v;
-                mPNRNumber = ((EditText)findViewById(R.id.id_et_pnr_sts)).getText().toString();
+
                 if(PNROkay(mPNRNumber)){
                     mBtnPNR.setText("Getting PNR status, please wait . . .");
                     mBtnPNR.setEnabled(false);
                     mGetPNRSts = new GetPNRStatus().execute(mPNRNumber);
-                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.id_et_pnr_sts)).getWindowToken(),0);
+                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.id_act_pnr_sts)).getWindowToken(),0);
                 } else {
-                    ((EditText)findViewById(R.id.id_et_pnr_sts)).setError("Invalid PNR Number");
+                    ((EditText)findViewById(R.id.id_act_pnr_sts)).setError("Invalid PNR Number");
                     mTextViewPNRSts.setText("Invalid PNR number");
                     mFrameLayout.removeAllViews();
                     mFrameLayout.addView(mTextViewPNRSts);
@@ -219,6 +261,9 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
                 createTableLayoutTrnDtls();
                 createTableLayoutPsnDtls();
                 combineTrainAndPsnDetails();
+                if(mStrPassengerDetails != null) {
+                    pnrDB.addPNR(mPNRNumber,mStrTrainDetails,mStrPassengerDetails);
+                }
             }
 
             super.onPostExecute(s);
@@ -254,7 +299,6 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            //dest = getPa
         }
     }
 
@@ -291,18 +335,26 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
             mTextViewPNRSts.setText("The PNR entered is either invalid or expired! Please check.");
             mFrameLayout.removeAllViews();
             mFrameLayout.addView(mTextViewPNRSts);
+            mStrPassengerDetails = null;
             return;
         }
         if(mPageResult.contains("Connectivity Failure") || mPageResult.contains("try again")) {
             mTextViewPNRSts.setText("Looks like server is busy or currently unavailable. Please try again later!");
             mFrameLayout.removeAllViews();
             mFrameLayout.addView(mTextViewPNRSts);
+            mStrPassengerDetails = null;
             return;
         }
         List<List<String>> passengersList;
         if (mPassengerDetails == null || mPassengerDetails.getPNR() != mPNRNumber) {
             Elements elements = Jsoup.parse(mPageResult).select("table tr td:containsOwn(S. No.)");
-            Iterator iterator = elements.first().parent().parent().getElementsByTag("tr").iterator();
+            Iterator iterator = null;
+            try {
+                iterator = elements.first().parent().parent().getElementsByTag("tr").iterator();
+            } catch (Exception e) {
+                Log.i("PNRStat", mPageResult);
+                return;
+            }
             passengersList = new ArrayList<List<String>>();
             List<String> list;
             Element tmp;
@@ -313,6 +365,10 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
                     list.add(tmp.select("td").get(0).text());
                     list.add(tmp.select("td").get(1).text());
                     list.add(tmp.select("td").get(2).text());
+                    if(!tmp.select("td").get(2).text().toUpperCase().contains("CNF") &&
+                            !tmp.select("td").get(2).text().toUpperCase().contains("CAN")){
+                        isWaitingList = true;
+                    }
                     passengersList.add(list);
                 }
             }
@@ -324,8 +380,11 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
         mTableLayoutPsn = new TableLayout(mActivity);
         TableRow row;
         TextView tv1, tv2, tv3,tv4;
+        mStrPassengerDetails = new ArrayList<String>();
+        int current;
         mTableLayoutPsn.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         for(int i=0; i<passengersList.size(); ++i) {
+            current = i+1;
             row = new TableRow(mActivity);
             row.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             tv1 = new TextView(mActivity);
@@ -348,10 +407,6 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
             tv3.setPadding(10,10,10,10);
             tv4.setPadding(10,10,10,10);
 
-            /*tv2.setBackgroundResource(R.drawable.card_divider);
-            tv3.setBackgroundResource(R.drawable.card_divider);
-            tv4.setBackgroundResource(R.drawable.card_divider);*/
-
             row.addView(tv1);
             row.addView(tv2);
             row.addView(tv3);
@@ -360,6 +415,8 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
             row.setBackgroundResource(R.drawable.card_background);
             row.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             mTableLayoutPsn.addView(row);
+            String strPsn = "" + current + ". " + passengersList.get(i).get(0) + "   " + passengersList.get(i).get(1) + "   " + passengersList.get(i).get(2);
+            mStrPassengerDetails.add(strPsn);
         }
     }
 
@@ -379,7 +436,13 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
         List<String> trainList;
         if (mTrainDetails == null || mTrainDetails.getPNR() != mPNRNumber) {
             Elements eleTrain = Jsoup.parse(mPageResult).select("table tr tr td:containsOwn(Train Number)");
-            Iterator iteTrain = eleTrain.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            Iterator iteTrain = null;
+            try {
+                iteTrain = eleTrain.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            } catch (Exception e) {
+                Log.i("PNRStat",mPageResult);
+                return;
+            }
             trainList = new ArrayList<String>();
             Element tmp;
             //Get the third row for train details
@@ -390,8 +453,6 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
                 trainList.add(tmp.select("td").get(0).text());
                 trainList.add(tmp.select("td").get(1).text());
                 trainList.add(tmp.select("td").get(2).text());
-//              trainList.add(tmp.select("td").get(3).text());
-//              trainList.add(tmp.select("td").get(4).text());
                 trainList.add(tmp.select("td").get(5).text());
                 trainList.add(tmp.select("td").get(6).text());
                 trainList.add(tmp.select("td").get(7).text());
@@ -403,6 +464,7 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
         mTableLayoutTrn = new TableLayout(mActivity);
         mTableLayoutTrn.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         TableRow row = new TableRow(mActivity);
+        mStrTrainDetails = new String();
         row.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         for(String list : trainList) {
             TextView tv = new TextView(mActivity);
@@ -410,6 +472,7 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
             tv.setPadding(10,10,10,10);
             tv.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Small);
             row.addView(tv);
+            mStrTrainDetails += list + " ";
         }
         row.setBackgroundResource(R.drawable.card_background);
         row.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
@@ -451,5 +514,86 @@ public class PNRStat extends SherlockActivity implements View.OnClickListener {
         ll.addView(mTableLayoutPsn);
         mFrameLayout.removeAllViews();
         mFrameLayout.addView(ll);
+        if(isWaitingList && !mPNRList.contains(mPNRNumber)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Track this PNR?");
+            builder.setMessage("Would you like this PNR to be tracked for status change?");
+            builder.setPositiveButton("Track",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //save the pnr
+                    pnrDB.addPNRToTrack(mPNRNumber);
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("No thanks",null);
+            builder.create().show();
+        }
+
+    }
+
+    private void showOfflinePNRStatus(String trainDetails, ArrayList<String> passnDetails) {
+        LinearLayout ll = new LinearLayout(mActivity);
+
+        TextView textViewTrnDtls = new TextView(mActivity);
+        TextView textViewPsnDtls = new TextView(mActivity);
+        TextView tvTrainDetails = new TextView(mActivity);
+        TextView [] tvPassnDetails = new TextView[passnDetails.size()];
+
+        textViewTrnDtls.setText("Train Details: " + mPNRNumber);
+        textViewTrnDtls.setFocusable(true);
+        textViewPsnDtls.setText("Passenger Details");
+        tvTrainDetails.setText(trainDetails);
+        textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+        textViewPsnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+        tvTrainDetails.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Small);
+        textViewTrnDtls.setPadding(10, 10, 10, 10);
+        textViewPsnDtls.setPadding(10,10,10,10);
+        tvTrainDetails.setPadding(10,10,10,10);
+
+        tvTrainDetails.setBackgroundResource(R.drawable.card_background);
+        textViewTrnDtls.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        textViewPsnDtls.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        ll.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.addView(textViewTrnDtls);
+
+        ll.addView(tvTrainDetails);
+        ll.addView(textViewPsnDtls);
+        for (int i=0;i<passnDetails.size();++i) {
+            tvPassnDetails[i] = new TextView(mActivity);
+            tvPassnDetails[i].setText(passnDetails.get(i));
+            tvPassnDetails[i].setPadding(10, 10, 10, 10);
+            tvPassnDetails[i].setBackgroundResource(R.drawable.card_background);
+            tvPassnDetails[i].setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Medium);
+            ll.addView(tvPassnDetails[i]);
+        }
+        mFrameLayout.removeAllViews();
+        mFrameLayout.addView(ll);
+    }
+
+    private void readAndShowOfflinePNRStatus() {
+        File filePNR = new File(pnrDB.getPNRDir(), mPNRNumber + ".dat");
+        ArrayList<String> passnDetails = new ArrayList<String>();
+        String trainDetails = "";
+        if(filePNR.exists()) {
+            try {
+                FileInputStream stream = new FileInputStream(filePNR);
+                InputStreamReader reader = new InputStreamReader(stream);
+                BufferedReader read = new BufferedReader(reader);
+                trainDetails = read.readLine();
+                String tmp = "";
+                while ((tmp = read.readLine()) != null) {
+                    passnDetails.add(tmp);
+                }
+                showOfflinePNRStatus(trainDetails,passnDetails);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }

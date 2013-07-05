@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="10dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="From:"
+            android:id="@+id/textView"
+            android:layout_alignBottom="@+id/id_act_from"
+            android:layout_alignParentLeft="true"/>
+    <AutoCompleteTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Source station name"
+            android:singleLine="true"
+            android:id="@+id/id_act_from"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/id_act_to"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="To:"
+            android:id="@+id/textView2"
+            android:layout_below="@+id/textView"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="12dp"/>
+    <AutoCompleteTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Destination station name"
+            android:singleLine="true"
+            android:id="@+id/id_act_to"
+            android:layout_alignBottom="@+id/textView2" android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/id_spinner_class"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Date:"
+            android:id="@+id/textView3"
+            android:layout_below="@+id/textView2" android:layout_alignParentLeft="true"
+            android:layout_marginTop="12dp"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/id_btn_date"
+            android:layout_below="@+id/id_act_to"
+            android:layout_alignRight="@+id/id_act_to"
+            android:layout_alignLeft="@+id/id_spinner_class"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Class:"
+            android:id="@+id/textView4"
+            android:layout_below="@+id/id_btn_date"
+            android:layout_marginTop="14dp"/>
+    <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_spinner_class"
+            android:layout_alignTop="@+id/textView4"
+            android:layout_alignLeft="@+id/radioGroup"
+            android:layout_alignBottom="@+id/textView4"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Quota:"
+            android:id="@+id/textView5"
+            android:layout_below="@+id/id_spinner_class"
+            android:paddingTop="10dp"/>
+    <RadioGroup
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/id_spinner_class"
+            android:orientation="horizontal"
+            android:id="@+id/radioGroup"
+            android:layout_toRightOf="@+id/textView6"
+            android:paddingTop="10dp">
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="General"
+                android:id="@+id/radioButton" android:checked="false"/>
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tatkal"
+                android:id="@+id/radioButton2" android:layout_gravity="left|center_vertical" android:checked="false"/>
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ladies"
+                android:id="@+id/radioButton3" android:layout_gravity="left|center_vertical" android:checked="false"/>
+    </RadioGroup>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Type:"
+            android:id="@+id/textView6" android:layout_below="@+id/radioGroup"
+            android:layout_marginTop="11dp"/>
+    <RadioGroup
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textView6"
+            android:layout_alignLeft="@+id/radioGroup"
+            android:orientation="horizontal" android:id="@+id/radioGroup2">
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="e-Ticket"
+                android:id="@+id/radioButton4" android:layout_gravity="left|center_vertical" android:checked="false"/>
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="i-Ticket"
+                android:id="@+id/radioButton5" android:layout_gravity="left|center_vertical" android:checked="false"/>
+    </RadioGroup>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get train list"
+            android:id="@+id/button2"
+            android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"/>
+</RelativeLayout>

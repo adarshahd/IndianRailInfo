@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+
+<html>
+<head>
+<title>IRCTC</title>
+     <link href="mobile.css" rel="stylesheet" type="text/css"/>
+     <meta http-equiv='Cache-Control' content='must-revalidate' forua='true'/>
+     <meta http-equiv='Cache-Control' content='no-cache' forua='true'/>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+     <meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" name="viewport">
+     <meta content="yes" name="apple-mobile-web-app-capable">
+     <meta content="true" name="HandheldFriendly">
+     <meta content="width" name="MobileOptimized">
+    <script type="text/javascript">
+        function fillDetails() {
+            var date = jsi.getDay() + jsi.getMonth() + jsi.getYear();
+            var cls = jsi.getClassTravel();
+            var src = jsi.getSRC();
+            var dst = jsi.getDST();
+            var form = document.forms['Planner'];
+            form.elements['userName'].value = jsi.getUserName();
+            form.elements['password'].value = jsi.getPassword();
+            form.elements['stationFrom'].value = src;
+            form.elements['stationTo'].value = dst;
+            form.elements['departureDate'].value = date;
+            form.elements['classCode'].value = cls;
+        }
+    </script>
+   
+</head>
+  <body onload="fillDetails();">
+<div id="mainframe">
+  <card title="image">
+        <div id="header"><span class="logo"><img style="vertical-align:top" src="irctclogobg.gif" alt="IRCTC Logo" /></span><div class="whiteboldpadding"><strong>&nbsp;&nbsp;Plan My Travel</strong></div></div>
+  </card>
+   <div class="gerytxtdiv">&nbsp;<div class="homeURL"><a href="https://www.irctc.co.in/cgi-bin/soft.dll/irctc/login.do"><img style="margin-bottom:4px;" src="home.gif" alt="Go to Home" /></a></div></div></div>
+<div align="center">
+
+</div>
+<form name="Planner" action="https://www.irctc.co.in/cgi-bin/soft.dll/irctc/planner.do" method="post" autocomplete="off">
+
+    <input type="hidden" name="userName" value=""/>
+    <input type="hidden" name="password" value=""/>
+
+   <div class="productbox"><strong>From</strong><br/>
+  
+     <input type="text" name="stationFrom" maxlength="20" size="20" value="" class="txtfld">&nbsp;
+  
+  
+     <input type="submit" name="buttonStnFrom" value="Get Code">
+</div>
+<div class="productbox"><strong>To</strong><br/>
+
+     <input type="text" name="stationTo" size="20" value="" class="txtfld">&nbsp;
+
+
+    <input type="submit" name="buttonStnTo" value="Get Code">
+</div>
+<div class="productbox"><strong>Departs</strong><br/>
+<input name="departureDate" class="textfileld" type="text" value="" maxlength = "8"/>
+<small>DDMMYYYY e.g. 01102011</small>
+<div class="clear"></div>
+</div>
+<div class="productbox"><strong>Class</strong><br/>
+<select name="classCode" id="select" class="combodrop">
+  <option>Select Class</option>
+ 
+				<option value="1A">First Class AC(1A)	</option>
+     
+				<option value="FC">First Class(FC)	</option>
+     
+				<option value="2A">AC 2-tier sleeper(2A)	</option>
+     
+				<option value="3A">AC 3 Tier(3A)	</option>
+     
+				<option value="CC">AC chair Car(CC)	</option>
+     
+				<option value="SL">Sleeper Class(SL)	</option>
+     
+				<option value="2S">Second Sitting(2S)	</option>
+     
+				<option value="3E">AC 3 Tier Economy(3E)	</option>
+     
+      </select>
+  </div>
+<div class="productbox"><strong>Quota</strong><br/>
+<div class="quotagen"><input name="quota" type="radio" class="selectradio" value="GN" checked="checked" /> General</div>
+<div class="quotalal"><input name="quota" class="selectradio" type="radio" value="CK" /> Tatkal</div>
+<div class="quotaitkt"><input name="quota" class="selectradio" type="radio" value="LD" /> Ladies</div>
+<div class="clear"></div>
+</div>
+<div class="productbox"><strong>Ticket type</strong><br/>
+<div class="quotagen"><input name="ticketType" type="radio" class="selectradio" value="eticket" checked="checked" />e-Ticket</div>
+<div class="quotalal"><input name="ticketType" class="selectradio" type="radio" value="iticket" />i-Ticket</div> 
+<div class="clear"></div>
+</div>
+<div class="separatorbox">&nbsp;</div>
+<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="buttonholder">
+  <tr>
+    <td width="50%" height="25" id="etkt" align="left" valign="middle"><input type="submit" value="TrainList" /></td>
+	<td width="50%" align="right" valign="middle"><a href="https://www.irctc.co.in/cgi-bin/soft.dll/irctc/login.do?BV_SessionID=@@@@0319586446.1370027040@@@@&BV_EngineID=cccladfkddfigifcefecehidfgmdfin.0" class="links">Back</a> </td>
+  </tr>
+</table>
+<div class="clear"></div>
+<div class="normalblack">&nbsp;</div>
+<div class="footercont">Copyright � 2013<a href="https://www.irctc.co.in">www.irctc.co.in</a><br/>
+All Rights Reserved</div>
+</form>
+</body>
+</html></wml>

@@ -1,16 +1,22 @@
 package com.adarshahd.indianrailinfo.donate;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -33,13 +39,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by ahd on 5/29/13.
  */
-public class TrainDetails extends SherlockActivity {
+public class TrainDetails extends SherlockActivity implements View.OnClickListener {
     //For fare enquiry
     //"http://www.indianrail.gov.in/cgi_bin/inet_frenq_cgi.cgi"
     //"lccp_trnno","lccp_day","lccp_month","lccp_srccode","lccp_dstncode","lccp_classopt","lccp_age","lccp_conc"-"ZZZZZZ",
@@ -77,6 +84,7 @@ public class TrainDetails extends SherlockActivity {
     private static String mAction;
     private static Details mDetails;
     private static String mPage;
+    private static Button mButtonAvailability;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,15 +95,23 @@ public class TrainDetails extends SherlockActivity {
         mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mDialog.setIndeterminate(true);
         mDialog.show();
+        mButtonAvailability = (Button) findViewById(R.id.id_btn_avail_next_7);
         if(savedInstanceState != null) {
-            mFrameLayout.removeAllViews();
+            mDetails = savedInstanceState.getParcelable("LIST");
+            if(mDetails == null) {
+                return;
+            }
             mFrameLayout = null;
             mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_details);
-            mDetails = savedInstanceState.getParcelable("LIST");
             if(mDetails.getAction().equals(TrainEnquiry.FARE)) {
+                getSupportActionBar().setTitle("Fare Details");
+                mButtonAvailability.setVisibility(View.GONE);
                 createTableLayoutTrainFare();
             }
             if(mDetails.getAction().equals(TrainEnquiry.AVAILABILITY)) {
+                getSupportActionBar().setTitle("Availability Details");
+                mButtonAvailability.setVisibility(View.VISIBLE);
+                mButtonAvailability.setOnClickListener(this);
                 createTableLayoutTrainAvailability();
             }
             return;
@@ -105,6 +121,7 @@ public class TrainDetails extends SherlockActivity {
         mAction = intent.getStringExtra(TrainEnquiry.ACTION);
         if(mAction.equals(TrainEnquiry.FARE)) {
             getSupportActionBar().setTitle("Fare Details");
+            mButtonAvailability.setVisibility(View.GONE);
             mTrainNumber = intent.getStringExtra(TrainEnquiry.TRAIN);
             mSrc = intent.getStringExtra(TrainEnquiry.SRC);
             mDst = intent.getStringExtra(TrainEnquiry.DST);
@@ -117,6 +134,8 @@ public class TrainDetails extends SherlockActivity {
         }
         if(mAction.equals(TrainEnquiry.AVAILABILITY)) {
             getSupportActionBar().setTitle("Availability Details");
+            mButtonAvailability.setVisibility(View.VISIBLE);
+            mButtonAvailability.setOnClickListener(this);
             mTrainNumber = intent.getStringExtra(TrainEnquiry.TRAIN);
             mSrc = intent.getStringExtra(TrainEnquiry.SRC);
             mDst = intent.getStringExtra(TrainEnquiry.DST);
@@ -144,16 +163,74 @@ public class TrainDetails extends SherlockActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         mDetails = null;
         super.onDestroy();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putString("ACTION",mAction);
         outState.putParcelable("LIST",mDetails);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.id_btn_avail_next_7:
+                Calendar cal = Calendar.getInstance();
+                cal.set(cal.get(Calendar.YEAR),Integer.parseInt(mMonth),Integer.parseInt(mDay));
+                cal.add(Calendar.DAY_OF_MONTH,6);
+                mDay = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
+                mMonth = String.valueOf(cal.get(Calendar.MONTH));
+                mDetails = null;
+                mFrameLayout = null;
+                mFrameLayout = (FrameLayout) findViewById(R.id.id_fl_details);
+                new GetAvail().execute();
+                mDialog.setMessage("Fetching train availability . . .");
+                mDialog.show();
+                break;
+            default:
+                final TextView tv = (TextView)((TableRow)v).getChildAt(1);
+                if(tv.getText().toString().contains("Date")) {
+                    return;
+                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(TrainDetails.this);
+                builder.setTitle("Book ticket");
+                builder.setMessage("You will be taken directly to IRCTC travel planner with all the information filled in it. Are you sure?");
+                builder.setPositiveButton("Yes, Book ticket",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String day = tv.getText().toString().split("-",0)[0].trim();
+                        String month = tv.getText().toString().split("-",0)[1].trim();
+                        if(day.length()<2) {
+                            day = "0" + day;
+                        }
+                        if(month.length()<2) {
+                            month = "0" + month;
+                        }
+                        Intent intent = new Intent(TrainDetails.this,IRCTCWeb.class);
+                        intent.setAction(IRCTCWeb.BOOK);
+                        intent.putExtra(TrainEnquiry.SRC,mSrc);
+                        intent.putExtra(TrainEnquiry.DST,mDst);
+                        intent.putExtra(TrainEnquiry.DAY_TRAVEL,day);
+                        intent.putExtra(TrainEnquiry.MONTH_TRAVEL,month);
+                        intent.putExtra(TrainEnquiry.CLS,mCls);
+                        //Toast.makeText(TrainDetails.this,"Day is: " + day + " Month is: " + month,Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                        startActivity(intent);
+                    }
+                });
+                builder.setNegativeButton("No Thanks",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.create().show();
+                break;
+        }
     }
 
     private class Details implements Parcelable {
@@ -235,10 +312,14 @@ public class TrainDetails extends SherlockActivity {
 
             mPage = result;
 
+            if(result.contains("SORRY")) {
+                return "SORRY";
+            }
+
             if(result.contains("Network Connectivity")) {
                 return "Network Connectivity";
             }
-            
+
             if(result.contains("ISL Of")) {
                 return "ISL Of";
             }
@@ -266,6 +347,33 @@ public class TrainDetails extends SherlockActivity {
     }
 
     private void createTableLayoutTrainFare() {
+        if(mPage.contains("SORRY")) {
+            TextView textViewTrnDtls = new TextView(mActivity);
+            textViewTrnDtls.setText("Not a valid class, Please select a different class and try again.");
+            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+            textViewTrnDtls.setPadding(10, 10, 10, 10);
+            textViewTrnDtls.setTextColor(Color.RED);
+            mFrameLayout.removeAllViews();
+            mFrameLayout.addView(textViewTrnDtls);
+            if(mDialog.isShowing()) {
+                mDialog.cancel();
+            }
+            return;
+        }
+        if(mPage.contains("ISL Of")) {
+            TextView textViewTrnDtls = new TextView(mActivity);
+            textViewTrnDtls.setText("Station is not in ISL Of the Train. \nPlease modify the source/destination!");
+            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+            textViewTrnDtls.setPadding(10, 10, 10, 10);
+            textViewTrnDtls.setTextColor(Color.RED);
+            mFrameLayout.removeAllViews();
+            mFrameLayout.addView(textViewTrnDtls);
+            if(mDialog.isShowing()) {
+                mDialog.cancel();
+            }
+            return;
+        }
+
         if(mPage.contains("ERROR")) {
             TextView textViewTrnDtls = new TextView(mActivity);
             textViewTrnDtls.setText("Your request resulted in an error.\nPlease check!");
@@ -279,7 +387,7 @@ public class TrainDetails extends SherlockActivity {
             }
             return;
         }
-        
+
         if(mPage.contains("Network Connectivity")) {
             TextView textViewTrnDtls = new TextView(mActivity);
             textViewTrnDtls.setText("Looks like the server is busy.\nPlease try later!");
@@ -293,7 +401,7 @@ public class TrainDetails extends SherlockActivity {
             }
             return;
         }
-        
+
         if(mPage.contains("unavailable")) {
             TextView textViewTrnDtls = new TextView(mActivity);
             textViewTrnDtls.setText("Response from server:\n\nYour request could not be processed now. \nPlease try again later!");
@@ -308,22 +416,13 @@ public class TrainDetails extends SherlockActivity {
             return;
         }
 
-        if(mPage.contains("ISL Of")) {
-            TextView textViewTrnDtls = new TextView(mActivity);
-            textViewTrnDtls.setText("Station is not in ISL Of the Train. \nPlease change the source/destination!");
-            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
-            textViewTrnDtls.setPadding(10, 10, 10, 10);
-            textViewTrnDtls.setTextColor(Color.RED);
-            mFrameLayout.removeAllViews();
-            mFrameLayout.addView(textViewTrnDtls);
-            if(mDialog.isShowing()) {
-                mDialog.cancel();
-            }
-            return;
-        }
-
         if(mDetails == null || !mDetails.getTrainNumber().equals(mTrainNumber)) {
-            Iterator iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            Iterator iterator = null;
+            try {
+                iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            } catch (Exception e) {
+                Log.i("TrainDetails", mPage);
+            }
             mListFr = new ArrayList<List<String>>();
             List<String> list;
             Element tmp;
@@ -368,6 +467,7 @@ public class TrainDetails extends SherlockActivity {
             mTblLayoutFr.addView(row);
         }
         LinearLayout ll = new LinearLayout(mActivity);
+        ScrollView scrollView = new ScrollView(mActivity);
         TextView textViewTrnDtls = new TextView(mActivity);
         textViewTrnDtls.setText("Fare details:");
         textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
@@ -376,8 +476,9 @@ public class TrainDetails extends SherlockActivity {
         ll.setOrientation(LinearLayout.VERTICAL);
         ll.addView(textViewTrnDtls);
         ll.addView(mTblLayoutFr);
+        scrollView.addView(ll);
         mFrameLayout.removeAllViews();
-        mFrameLayout.addView(ll);
+        mFrameLayout.addView(scrollView);
         if(mDialog.isShowing()) {
             mDialog.cancel();
         }
@@ -441,9 +542,13 @@ public class TrainDetails extends SherlockActivity {
             }
             //Jsoup.par
             mPage = result;
-            
+
             if(result.contains("Network Connectivity")) {
                 return "Network Connectivity";
+            }
+
+            if(result.contains("SORRY")) {
+                return "SORRY";
             }
 
             if(result.contains("ISL Of")) {
@@ -474,6 +579,34 @@ public class TrainDetails extends SherlockActivity {
 
     private void createTableLayoutTrainAvailability() {
 
+        if(mPage.contains("SORRY")) {
+            TextView textViewTrnDtls = new TextView(mActivity);
+            textViewTrnDtls.setText("Not a valid class, Please select a different class and try again.");
+            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+            textViewTrnDtls.setPadding(10, 10, 10, 10);
+            textViewTrnDtls.setTextColor(Color.RED);
+            mFrameLayout.removeAllViews();
+            mFrameLayout.addView(textViewTrnDtls);
+            if(mDialog.isShowing()) {
+                mDialog.cancel();
+            }
+            return;
+        }
+
+        if(mPage.contains("ISL Of")) {
+            TextView textViewTrnDtls = new TextView(mActivity);
+            textViewTrnDtls.setText("Station is not in ISL Of the Train. \nPlease modify the source/destination!");
+            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
+            textViewTrnDtls.setPadding(10, 10, 10, 10);
+            textViewTrnDtls.setTextColor(Color.RED);
+            mFrameLayout.removeAllViews();
+            mFrameLayout.addView(textViewTrnDtls);
+            if(mDialog.isShowing()) {
+                mDialog.cancel();
+            }
+            return;
+        }
+
         if(mPage.contains("ERROR")) {
             TextView textViewTrnDtls = new TextView(mActivity);
             textViewTrnDtls.setText("Your request resulted in an error.\nPlease check!");
@@ -487,20 +620,7 @@ public class TrainDetails extends SherlockActivity {
             }
             return;
         }
-        if(mPage.contains("unavailable")) {
-            TextView textViewTrnDtls = new TextView(mActivity);
-            textViewTrnDtls.setText("Response from server:\n\nYour request could not be processed now.\nPlease try again later!");
-            textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
-            textViewTrnDtls.setPadding(10, 10, 10, 10);
-            textViewTrnDtls.setTextColor(Color.RED);
-            mFrameLayout.removeAllViews();
-            mFrameLayout.addView(textViewTrnDtls);
-            if(mDialog.isShowing()) {
-                mDialog.cancel();
-            }
-            return;
-        }
-        
+
         if(mPage.contains("Network Connectivity")) {
             TextView textViewTrnDtls = new TextView(mActivity);
             textViewTrnDtls.setText("Looks like the server is busy.\nPlease try later!");
@@ -514,11 +634,10 @@ public class TrainDetails extends SherlockActivity {
             }
             return;
         }
-        
 
-        if(mPage.contains("ISL Of")) {
+        if(mPage.contains("unavailable")) {
             TextView textViewTrnDtls = new TextView(mActivity);
-            textViewTrnDtls.setText("Station is not in ISL Of the Train. \nPlease change the source/destination!");
+            textViewTrnDtls.setText("Response from server:\n\nYour request could not be processed now.\nPlease try again later!");
             textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
             textViewTrnDtls.setPadding(10, 10, 10, 10);
             textViewTrnDtls.setTextColor(Color.RED);
@@ -531,7 +650,14 @@ public class TrainDetails extends SherlockActivity {
         }
 
         if(mDetails == null || !mDetails.getTrainNumber().equals(mTrainNumber)) {
-            Iterator iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            Iterator iterator = null;
+            try {
+                iterator = mElements.first().parent().parent().parent().getElementsByTag("tr").iterator();
+            } catch (Exception e) {
+                Log.i("TrainDetails",mPage);
+                e.printStackTrace();
+                return;
+            }
             mListAv = new ArrayList<List<String>>();
             List<String> list;
             Element tmp;
@@ -599,9 +725,11 @@ public class TrainDetails extends SherlockActivity {
 
             row.setBackgroundResource(R.drawable.button_selector);
             row.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+            row.setOnClickListener(this);
             mTblLayoutAv.addView(row);
         }
         LinearLayout ll = new LinearLayout(mActivity);
+        ScrollView scrollView = new ScrollView(mActivity);
         TextView textViewTrnDtls = new TextView(mActivity);
         textViewTrnDtls.setText("Availability details:");
         textViewTrnDtls.setTextAppearance(mActivity, android.R.style.TextAppearance_DeviceDefault_Large);
@@ -610,8 +738,9 @@ public class TrainDetails extends SherlockActivity {
         ll.setOrientation(LinearLayout.VERTICAL);
         ll.addView(textViewTrnDtls);
         ll.addView(mTblLayoutAv);
+        scrollView.addView(ll);
         mFrameLayout.removeAllViews();
-        mFrameLayout.addView(ll);
+        mFrameLayout.addView(scrollView);
         if(mDialog.isShowing()) {
             mDialog.cancel();
         }

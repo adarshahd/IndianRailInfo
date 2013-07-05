@@ -15,6 +15,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -22,23 +23,34 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.Calendar;
+import java.util.Iterator;
+
 public class IRCTCWeb extends SherlockActivity {
 
+    public static final String BOOK = "BOOK";
     private WebView mWebViewMain;
     private static SharedPreferences mPrefs;
     private static boolean mAskForSave;
     private static SherlockActivity mActivity;
     private static Util mUtil;
+    private static String mDay = "";
+    private static String mMonth = "";
+    private static String mSrc = "";
+    private static String mDst = "";
+    private static Calendar mCal;
+    private static String mCls = "";
+    private static Intent mIntent;
+    private static String mPage = "";
+    private static String mPNRNumber = "";
 
     //    private static ProgressBar mProgBar;
     private static MenuItem mMenuStopLoading;
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mUtil.delete();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +59,18 @@ public class IRCTCWeb extends SherlockActivity {
         setContentView(R.layout.layout_irctcweb);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("IRCTC Mobile");
+        mIntent = getIntent();
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mAskForSave = mPrefs.getBoolean("ask_save_user_info",true);
+        mAskForSave = mPrefs.getBoolean("ask_save_user_info", true);
         mActivity = this;
         mUtil = Util.getUtil(this);
-
-
-
         setupWebView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mUtil.delete();
     }
 
     private void setupWebView() {
@@ -65,7 +81,23 @@ public class IRCTCWeb extends SherlockActivity {
         mWebViewMain.addJavascriptInterface(new JSInterface(mActivity),"jsi");
         mWebViewMain.setWebViewClient(new IRCTCClient(mActivity));
         mWebViewMain.setWebChromeClient(new IRCTCChromeClient());
+
+        if(mIntent != null && mIntent.getAction() != null && mIntent.getAction().equals(BOOK)) {
+            //Directly show the booking screen
+            mSrc = mIntent.getStringExtra(TrainEnquiry.SRC);
+            mDst = mIntent.getStringExtra(TrainEnquiry.DST);
+            mDay = mIntent.getStringExtra(TrainEnquiry.DAY_TRAVEL);
+            mMonth = mIntent.getStringExtra(TrainEnquiry.MONTH_TRAVEL);
+            mCls = mIntent.getStringExtra(TrainEnquiry.CLS);
+            if(mPrefs.getString("username","").equals("")) {
+                showAlertLoginInfo();
+                return;
+            }
+            mWebViewMain.loadUrl("file:///android_asset/planner.htm");
+            return;
+        }
         mWebViewMain.loadUrl("file:///android_asset/mobile.htm");
+        //mWebViewMain.loadUrl("file:///android_asset/congratulations.htm");
     }
 
 
@@ -96,9 +128,6 @@ public class IRCTCWeb extends SherlockActivity {
                 return true;
             case R.id.action_reload:
                 mWebViewMain.reload();
-                return true;
-            case R.id.action_preferences:
-                startActivity(new Intent(this,PrefActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 return true;
             case R.id.action_back:
                 if(isHomePage(mWebViewMain)) {
@@ -194,6 +223,44 @@ public class IRCTCWeb extends SherlockActivity {
                 dialog.show();
             }
         }
+
+        @JavascriptInterface
+        public String getDay() {
+            return mDay;
+        }
+
+        @JavascriptInterface
+        public String getMonth() {
+            return mMonth;
+        }
+
+        @JavascriptInterface
+        public String getYear() {
+            return String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        }
+
+        @JavascriptInterface
+        public String getSRC() {
+            return mSrc;
+        }
+
+        @JavascriptInterface
+        public String getDST() {
+            return mDst;
+        }
+
+        @JavascriptInterface
+        public String getClassTravel() {
+            return mCls;
+        }
+
+        @JavascriptInterface
+        public void trackSuccessfulBooking(String htmlPage) {
+            if(htmlPage.contains("Congratulations")) {
+                mPage = htmlPage;
+                showTrackDialog();
+            }
+        }
     }
 
     public class IRCTCClient extends WebViewClient {
@@ -205,7 +272,8 @@ public class IRCTCWeb extends SherlockActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-
+            view.loadUrl("javascript:window.jsi.trackSuccessfulBooking" +
+                    "('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
         }
 
         @Override
@@ -253,5 +321,103 @@ public class IRCTCWeb extends SherlockActivity {
         } else {
             return false;
         }
+    }
+
+    private void showLoginDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(IRCTCWeb.this);
+        final View view = getLayoutInflater().inflate(R.layout.layout_login,null);
+        builder.setView(view);
+        builder.setTitle("Login Information");
+
+        builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String userName = ((EditText)view.findViewById(R.id.id_et_username)).getText().toString();
+                String password = ((EditText)view.findViewById(R.id.id_et_password)).getText().toString();
+                if(userName.equals("")) {
+                    ((EditText)view.findViewById(R.id.id_et_username)).setError("Username can not be empty");
+                    return;
+                }
+                mPrefs.edit().putString("username", userName).commit();
+                mPrefs.edit().putString("password", password).commit();
+                mPrefs.edit().putBoolean("enable_auto_login", true).commit();
+                IRCTCWeb.this.finish();
+            }
+        });
+        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void showAlertLoginInfo() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(IRCTCWeb.this);
+        builder.setTitle("Need Login Info");
+        builder.setMessage("Looks like you have not enabled auto login feature and entered your login details of IRCTC. With out these information it is not possible to book tickets directly. Would you like to enter login information now?\n\nAfter entering these you will be taken back to availability page, select the info again to book tickets.");
+        builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showLoginDialog();
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    private static void showTrackDialog() {
+        if (needTracking()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            builder.setTitle("Congratulations!");
+            builder.setMessage("Congratulations on your ticket booking! Would you like to track the current PNR number for status change?");
+            builder.setPositiveButton("Yes, Please",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(mActivity, "Done. You will be notified of status change", Toast.LENGTH_SHORT).show();
+                    if(mPNRNumber != null && !mPNRNumber.equals("") && mPNRNumber.length() == 10) {
+                        PNRDatabase.getPNRDatabase(mActivity).addPNRToTrack(mPNRNumber);
+                    }
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+        }
+    }
+
+    private static void trackPNR () {
+
+    }
+
+    private static boolean needTracking() {
+        boolean needTracking = false;
+        Elements elements = Jsoup.parse(mPage).getElementsByClass("productbox");
+        Iterator iterator = elements.iterator();
+        Element element = (Element) iterator.next();
+        mPNRNumber = element.select("div").get(0).text().split(": ",0)[1];
+        for(int i=0; i<6;++i) {
+            iterator.next();
+        }
+        while(iterator.hasNext()) {
+            String currentStatus = ((Element) iterator.next()).select("div").get(0).text();
+            if(!currentStatus.contains("CNF")) {
+                needTracking = true;
+            }
+        }
+        return needTracking;
     }
 }
