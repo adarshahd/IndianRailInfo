@@ -1,3 +1,20 @@
+/**
+ *   Copyright (C) 2013  Adarsha HD
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.adarshahd.indianrailinfo.donate;
 
 
@@ -33,7 +50,7 @@ public class Presenter extends SherlockActivity implements View.OnClickListener{
     @Override
     protected void onStart() {
         super.onStart();
-        ((Button)findViewById(R.id.id_btn_trn_book)).setOnClickListener(this);
+        //((Button)findViewById(R.id.id_btn_trn_book)).setOnClickListener(this);
         ((Button)findViewById(R.id.id_btn_pnr_sts)).setOnClickListener(this);
         ((Button)findViewById(R.id.id_btn_trn_enq)).setOnClickListener(this);
         rateMyApp();
@@ -59,9 +76,9 @@ public class Presenter extends SherlockActivity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.id_btn_trn_book:
+            /*case R.id.id_btn_trn_book:
                 startActivity(new Intent(this,IRCTCWeb.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                return;
+                return;*/
             case R.id.id_btn_pnr_sts:
                 startActivity(new Intent(this,PNRStat.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 return;

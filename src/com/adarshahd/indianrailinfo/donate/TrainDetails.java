@@ -1,3 +1,20 @@
+/**
+ *   Copyright (C) 2013  Adarsha HD
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.adarshahd.indianrailinfo.donate;
 
 import android.app.AlertDialog;
@@ -666,7 +683,7 @@ public class TrainDetails extends SherlockActivity implements View.OnClickListen
             list.add(tmp.select("th").get(0).text());
             list.add("Date");
             list.add(tmp.select("th").get(2).text());
-            list.add(tmp.select("th").get(3).text());
+            //list.add(tmp.select("th").get(3).text());
             mListAv.add(list);
             while(iterator.hasNext()) {
                 tmp = (Element) iterator.next();
@@ -677,7 +694,7 @@ public class TrainDetails extends SherlockActivity implements View.OnClickListen
                 list.add(tmp.select("td").get(0).text());
                 list.add(tmp.select("td").get(1).text());
                 list.add(tmp.select("td").get(2).text());
-                list.add(tmp.select("td").get(3).text());
+                //list.add(tmp.select("td").get(3).text());
                 mListAv.add(list);
             }
             mDetails = new Details(mListAv,TrainEnquiry.AVAILABILITY,mTrainNumber);
@@ -686,33 +703,33 @@ public class TrainDetails extends SherlockActivity implements View.OnClickListen
         }
         mTblLayoutAv = new TableLayout(mActivity);
         TableRow row;
-        TextView tv1, tv2, tv3,tv4;
+        TextView tv1, tv2, tv3;
         mTblLayoutAv.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         for(int i=0;i<mListAv.size();i++) {
             row = new TableRow(mActivity);
             tv1 = new TextView(mActivity);
             tv2 = new TextView(mActivity);
             tv3 = new TextView(mActivity);
-            tv4 = new TextView(mActivity);
+            //tv4 = new TextView(mActivity);
 
 
 
             tv1.setText("   " + mListAv.get(i).get(0));
             tv2.setText("   " + mListAv.get(i).get(1));
             tv3.setText("   " + mListAv.get(i).get(2));
-            tv4.setText("   " + mListAv.get(i).get(3));
+            //tv4.setText("   " + mListAv.get(i).get(3));
 
 
             tv1.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Medium);
             tv2.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Medium);
             tv3.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Medium);
-            tv4.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Medium);
+            //tv4.setTextAppearance(mActivity,android.R.style.TextAppearance_DeviceDefault_Medium);
 
 
             tv1.setPadding(5,5,5,5);
             tv2.setPadding(5,5,5,5);
             tv3.setPadding(5,5,5,5);
-            tv4.setPadding(5,5,5,5);
+            //tv4.setPadding(5,5,5,5);
 
         /*tv2.setBackgroundResource(R.drawable.card_divider);
         tv3.setBackgroundResource(R.drawable.card_divider);
@@ -721,7 +738,7 @@ public class TrainDetails extends SherlockActivity implements View.OnClickListen
             row.addView(tv1);
             row.addView(tv2);
             row.addView(tv3);
-            row.addView(tv4);
+            //row.addView(tv4);
 
             row.setBackgroundResource(R.drawable.button_selector);
             row.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
