@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         multiDexEnabled true
-        applicationId "com.adarshahd.indianrailinfo"
+        applicationId "com.adarshahd.indianrailinfo.donate"
         minSdkVersion 12
         targetSdkVersion 23
         versionCode 15
