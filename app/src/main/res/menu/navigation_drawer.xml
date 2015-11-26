@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single"
+        android:id="@+id/top">
+        <item
+            android:id="@+id/pnrStatus"
+            android:title="PNR Status"
+            android:checked="false"
+            android:icon="@drawable/seat"/>
+        <item
+            android:id="@+id/trainDetails"
+            android:title="Train Details"
+            android:checked="false"
+            android:icon="@drawable/rail"/>
+    </group>
+
+    <group android:checkableBehavior="none"
+        android:id="@+id/bottom">
+        <item
+            android:id="@+id/prefs"
+            android:title="Preferences"
+            android:checked="false"
+            android:icon="@drawable/settings"/>
+    </group>
+
+</menu>

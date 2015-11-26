@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_margin="2dp"
+            android:background="@color/grey_500">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/trainName"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:layout_height="wrap_content"
+                    android:text="Bangalore Express"
+                    android:padding="8dp"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/trainNumber"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="16228"
+                    android:textAppearance="?android:textAppearanceLarge" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="From"
+                        android:gravity="center"
+                        android:padding="4dp" />
+
+                    <TextView
+                        android:id="@+id/from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sagar Jambagaru"
+                        android:gravity="center"
+                        android:textAppearance="?android:textAppearanceMedium" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="To"
+                        android:gravity="center"
+                        android:padding="4dp" />
+
+                    <TextView
+                        android:id="@+id/to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bangalore City"
+                        android:gravity="center"
+                        android:textAppearance="?android:textAppearanceMedium" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="Departure"
+                        android:gravity="center"
+                        android:padding="4dp" />
+
+                    <TextView
+                        android:id="@+id/departure"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="20:40"
+                        android:gravity="center"
+                        android:textAppearance="?android:textAppearanceMedium" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="Arrival"
+                        android:gravity="center"
+                        android:padding="4dp" />
+
+                    <TextView
+                        android:id="@+id/arrival"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="04:30"
+                        android:gravity="center"
+                        android:textAppearance="?android:textAppearanceMedium" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/getAvailability"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Availability"
+            android:padding="12dp"
+            style="@style/ButtonGreen"/>
+        <Button
+            android:id="@+id/getFare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get fare"
+            android:padding="12dp"
+            style="@style/ButtonBlue"/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

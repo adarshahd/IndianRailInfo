@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/id_menu_delete_pnr_track"
-        android:title="Stop tracking"
-        android:icon="@drawable/content_discard"/>
-</menu>

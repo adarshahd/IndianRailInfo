@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/id_action_pref"
-        android:title="Preferences"
-        android:showAsAction="ifRoom|withText"
-        android:icon="@drawable/action_settings" />
-</menu>

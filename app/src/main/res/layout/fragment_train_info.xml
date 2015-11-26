@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/containerTrainInfo"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/pnrStatusAd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="-10dp"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/train_details_ad">
+    </com.google.android.gms.ads.AdView>
+
+    <LinearLayout
+        android:id="@+id/search_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/source"
+                style="@style/ButtonGreen"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="4"
+                android:text="SRF"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+            <ImageButton
+                android:id="@+id/swap"
+                style="@style/ButtonGrey"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/swap" />
+
+            <Button
+                android:id="@+id/destination"
+                style="@style/ButtonLime"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="4"
+                android:text="SBC"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/travelDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/calendar"
+                android:drawableStart="@drawable/calendar"
+                style="?android:buttonBarButtonStyle"
+                android:text="Select Date" />
+
+            <Spinner
+                android:id="@+id/travelClass"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                style="?android:spinnerItemStyle"
+                android:entries="@array/travelClass"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/getTrains"
+            style="@style/ButtonBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Get Trains" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/newSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_margin="8dp"
+        android:drawableLeft="@drawable/refresh"
+        android:drawableStart="@drawable/refresh"
+        style="@style/ButtonOrange"
+        android:text="New search"
+        android:visibility="gone"/>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_margin="8dp"
+        android:id="@+id/trainList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>
