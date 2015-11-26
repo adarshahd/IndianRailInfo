@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:orientation="vertical"
-    tools:context="com.adarshahd.indianrailinfo.fragments.PNRCheckFragment">
+    tools:context="com.adarshahd.donate.fragments.PNRCheckFragment">
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/pnrStatusAd"

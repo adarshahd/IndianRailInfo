@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    tools:context="com.adarshahd.indianrailinfo.activities.MainActivity">
+    tools:context="com.adarshahd.donate.activities.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
