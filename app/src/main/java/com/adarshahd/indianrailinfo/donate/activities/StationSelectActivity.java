@@ -28,8 +28,13 @@ public class StationSelectActivity extends AppCompatActivity {
         findViewById(R.id.stationSelect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String station = stationName.getText().toString();
+                if(!station.contains("-") || station.split("-").length != 2) {
+                    stationName.setError("Invalid Station!");
+                    return;
+                }
                 Intent result = new Intent();
-                result.putExtra("station_name", stationName.getText().toString());
+                result.putExtra("station_name", station);
                 setResult(RESULT_OK, result);
                 finish();
             }

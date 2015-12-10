@@ -1,6 +1,5 @@
 package com.adarshahd.indianrailinfo.donate.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
@@ -127,7 +125,6 @@ public class PNRCheckFragment extends Fragment {
                 } else {
                     ((AutoCompleteTextView) view.findViewById(R.id.act_pnr_number)).setError("Invalid PNR Number");
                 }
-                hideSoftKeyboard(getActivity());
             }
         });
 
@@ -170,6 +167,9 @@ public class PNRCheckFragment extends Fragment {
             Gson gson = new GsonBuilder().create();
             try {
                 pnrStatus = gson.fromJson(jsonData, PnrStatus.class);
+                if(pnrStatus == null) {
+                    throw new JsonParseException("Failed to parse");
+                }
                 if (pnrStatus.getReservedUpto() == null) {
                     throw new JsonParseException("Failed to parse");
                 }
@@ -362,19 +362,10 @@ public class PNRCheckFragment extends Fragment {
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("9D0E16943FB02A39D19A8708D7BE55AC")
-                .addTestDevice("981A0351894931810AEC401471AE2B6C")
-                .addTestDevice("EB335A825CEBE05DF4658F8CDACADF33")
-                .addTestDevice("0422760080CDFA324749880B2C398E07")
-                .addTestDevice("9439211E72AA570B582E5C4DB22E4259")
+                .addTestDevice("YOUR DEVICE ID")
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
-    }
-
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
 }

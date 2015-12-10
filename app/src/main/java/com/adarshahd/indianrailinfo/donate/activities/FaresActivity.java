@@ -39,6 +39,7 @@ public class FaresActivity extends AppCompatActivity {
     private String destination;
     private String date;
     private String month;
+    private String year;
     private String travelClass;
     private String quota;
     private String actualSource;
@@ -78,6 +79,7 @@ public class FaresActivity extends AppCompatActivity {
         actualDestination = bundleTrainFare.getString("actual_destination");
         date = bundleTrainFare.getString("date");
         month = bundleTrainFare.getString("month");
+        year = bundleTrainFare.getString("year");
         travelClass = bundleTrainFare.getString("travel_class");
         quota = bundleTrainFare.getString("quota");
         fareRefreshed = false;
@@ -178,6 +180,7 @@ public class FaresActivity extends AppCompatActivity {
                     destination,
                     date,
                     month,
+                    year,
                     travelClass,
                     quota);
             try {
@@ -190,7 +193,7 @@ public class FaresActivity extends AppCompatActivity {
                 }
             } catch (JsonParseException e) {
                 try {
-                    JSONObject object = new JSONObject(jsonData);
+                    JSONObject object = new JSONObject(jsonData == null ? "" : jsonData);
                     if (object.has("error")) {
                         errorMessage = object.getString("error");
                         if (errorMessage.contains("is not covered")){

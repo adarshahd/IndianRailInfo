@@ -51,10 +51,11 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
     private static final Integer ERROR = 224;
     private static final Integer SUCCESS = 225;
 
-    private String stationFrom = "SRF"; //MY HOME, SWEET HOME :-)
+    private String stationFrom = "SRF";
     private String stationTo = "SBC";
     private String travelDate;
     private String travelMonth;
+    private String travelYear;
     //private String trainNumber;
     private String travelClass;
     private String errorMessage;
@@ -80,6 +81,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
                 String destination,
                 String date,
                 String month,
+                String year,
                 String travelClass,
                 String quota);
     }
@@ -93,6 +95,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
                 String destination,
                 String date,
                 String month,
+                String year,
                 String travelClass,
                 String quota);
     }
@@ -218,6 +221,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         travelDate = dayOfMonth + "";
         travelMonth = monthOfYear + 1 + "";
+        travelYear = year + "";
         date.setError(null);
         date.setText(travelDate + "/" + travelMonth + "/" + year);
     }
@@ -253,7 +257,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
             if (!Utility.isConnected(getActivity())) {
                 return NO_NETWORK;
             }
-            String jsonData = Utility.getTrainBetweenStations(stationFrom, stationTo, travelDate, travelMonth, travelClass);
+            String jsonData = Utility.getTrainBetweenStations(stationFrom, stationTo, travelDate, travelMonth, travelYear, travelClass);
             Gson gson = new GsonBuilder().create();
             try {
                 trains = gson.fromJson(jsonData, Trains.class);
@@ -265,7 +269,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
                 }
             } catch (JsonParseException e) {
                 try {
-                    JSONObject object = new JSONObject(jsonData);
+                    JSONObject object = new JSONObject(jsonData == null ? "" : jsonData);
                     if (object.has("error")) {
                         errorMessage = object.getString("error");
                     }
@@ -469,6 +473,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
                 stationTo,
                 travelDate,
                 travelMonth,
+                travelYear,
                 travelClass,
                 "GN");
     }
@@ -483,6 +488,7 @@ public class TrainInfoFragment extends Fragment implements DatePickerDialog.OnDa
                 stationTo,
                 travelDate,
                 travelMonth,
+                travelYear,
                 travelClass,
                 "GN");
     }

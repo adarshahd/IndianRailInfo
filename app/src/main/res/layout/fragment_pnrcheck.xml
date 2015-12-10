@@ -28,6 +28,7 @@
             android:layout_weight="4"
             android:gravity="center"
             android:hint="PNR Number"
+            android:selectAllOnFocus="true"
             android:inputType="number"
             android:maxLength="10"
             android:imeOptions="actionGo"/>

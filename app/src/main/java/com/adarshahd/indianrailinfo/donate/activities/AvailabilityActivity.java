@@ -46,6 +46,7 @@ public class AvailabilityActivity extends AppCompatActivity {
     private String destination;
     private String date;
     private String month;
+    private String year;
     private String travelClass;
     private String quota;
     private String actualSource;
@@ -96,6 +97,7 @@ public class AvailabilityActivity extends AppCompatActivity {
         actualDestination = trainData.getString("actual_destination");
         date = trainData.getString("date");
         month = trainData.getString("month");
+        year = trainData.getString("year");
         travelClass = trainData.getString("travel_class");
         quota = trainData.getString("quota");
 
@@ -117,10 +119,14 @@ public class AvailabilityActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 view.setEnabled(false);
+                if(mAvailability == null){
+                    finish();
+                    return;
+                }
                 Availability availability = mAvailability.get(mAvailability.size() - 1);
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(availability.getDate().split("-")[0]));
-                calendar.set(Calendar.MONTH, Integer.parseInt(availability.getDate().split("-")[1]) - 1);
+                calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(availability.getDate().split("-")[0].trim()));
+                calendar.set(Calendar.MONTH, Integer.parseInt(availability.getDate().split("-")[1].trim()) - 1);
                 //calendar.add(Calendar.DAY_OF_MONTH, 6);
                 date = calendar.get(Calendar.DAY_OF_MONTH) + "";
                 month = (calendar.get(Calendar.MONTH) + 1) + "";
@@ -160,7 +166,7 @@ public class AvailabilityActivity extends AppCompatActivity {
                 return NO_NETWORK;
             }
             Gson gson = new GsonBuilder().create();
-            String jsonData = Utility.getTrainAvailability(trainNumber, source, destination, date, month, travelClass, quota);
+            String jsonData = Utility.getTrainAvailability(trainNumber, source, destination, date, month, year, travelClass, quota);
             TrainAvailability trainAvailability;
             try {
                 trainAvailability = gson.fromJson(jsonData, TrainAvailability.class);
@@ -173,7 +179,7 @@ public class AvailabilityActivity extends AppCompatActivity {
                 mAvailability = trainAvailability.getTrainAvailability();
             } catch (JsonParseException e) {
                 try {
-                    JSONObject object = new JSONObject(jsonData);
+                    JSONObject object = new JSONObject(jsonData == null ? "" : jsonData);
                     if (object.has("error")) {
                         errorMessage = object.getString("error");
                         if (errorMessage.contains("is not covered")){

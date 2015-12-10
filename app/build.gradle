@@ -25,8 +25,8 @@ android {
         applicationId "com.adarshahd.indianrailinfo.donate"
         minSdkVersion 12
         targetSdkVersion 23
-        versionCode 15
-        versionName "2.0.0"
+        versionCode 16
+        versionName "2.0.1"
     }
     buildTypes {
         release {

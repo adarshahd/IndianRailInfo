@@ -81,32 +81,35 @@ public class Utility {
         return get("pnr", "get", "", data);
     }
 
-    public static synchronized String getTrainBetweenStations(String source, String destination, String date, String month, String travelClass) {
+    public static synchronized String getTrainBetweenStations(String source, String destination, String date, String month, String year, String travelClass) {
         String data = "source=" + source +
                 "&destination=" + destination +
                 "&date=" + date +
                 "&month=" + month +
+                "&year=" + year +
                 "&travel_class=" + travelClass;
         return get("tbs", "get", "", data);
     }
 
-    public static synchronized String getTrainAvailability(String trainNumber, String source, String destination, String date, String month, String travelClass, String quota) {
+    public static synchronized String getTrainAvailability(String trainNumber, String source, String destination, String date, String month, String year, String travelClass, String quota) {
         String data = "train_number=" + trainNumber +
                 "&source=" + source +
                 "&destination=" + destination +
                 "&date=" + date +
                 "&month=" + month +
+                "&year=" + year +
                 "&travel_class=" + travelClass +
                 "&quota=" + quota;
         return get("ta", "get", "", data);
     }
 
-    public static synchronized String getTrainFare(String trainNumber, String source, String destination, String date, String month, String travelClass, String quota) {
+    public static synchronized String getTrainFare(String trainNumber, String source, String destination, String date, String month, String year, String travelClass, String quota) {
         String data = "train_number=" + trainNumber +
                 "&source=" + source +
                 "&destination=" + destination +
                 "&date=" + date +
                 "&month=" + month +
+                "&year=" + year +
                 "&travel_class=" + travelClass +
                 "&quota=" + quota;
         return get("tf", "get", "", data);
