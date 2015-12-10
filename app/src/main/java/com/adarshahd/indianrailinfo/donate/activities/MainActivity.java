@@ -23,6 +23,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.adarshahd.indianrailinfo.donate.R;
 import com.adarshahd.indianrailinfo.donate.fragments.PNRCheckFragment;
@@ -162,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
         }
 
         rateMyApp();
+
+        //hideSoftKeyboard(this);
     }
 
     @Override
@@ -232,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
     }
 
     @Override
-    public void onAvailabilityClick(Train train, String trainNumber, String trainName, String source, String destination, String date, String month, String travelClass, String quota) {
+    public void onAvailabilityClick(Train train, String trainNumber, String trainName, String source, String destination, String date, String month, String year, String travelClass, String quota) {
         Bundle bundle = new Bundle();
         bundle.putString("train_number", trainNumber);
         bundle.putString("train_name", trainName);
@@ -240,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
         bundle.putString("destination", destination);
         bundle.putString("date", date);
         bundle.putString("month", month);
+        bundle.putString("year", year);
         bundle.putString("travel_class", travelClass);
         bundle.putString("quota", quota);
         bundle.putString("actual_source", train.getSource().replaceAll("[+#*]", ""));
@@ -252,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
     }
 
     @Override
-    public void onFareClick(Train train, String trainNumber, String trainName, String source, String destination, String date, String month, String travelClass, String quota) {
+    public void onFareClick(Train train, String trainNumber, String trainName, String source, String destination, String date, String month, String year, String travelClass, String quota) {
         Bundle bundle = new Bundle();
         bundle.putString("train_number", trainNumber);
         bundle.putString("train_name", trainName);
@@ -260,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
         bundle.putString("destination", destination);
         bundle.putString("date", date);
         bundle.putString("month", month);
+        bundle.putString("year", year);
         bundle.putString("travel_class", travelClass);
         bundle.putString("quota", quota);
         bundle.putString("actual_source", train.getSource().replaceAll("[+#*]", ""));
@@ -450,5 +455,10 @@ public class MainActivity extends AppCompatActivity implements TrainInfoFragment
         builder.setCancelable(false);
         dialog = builder.create();
         dialog.show();
+    }
+
+    public static void hideSoftKeyboard(AppCompatActivity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 }
